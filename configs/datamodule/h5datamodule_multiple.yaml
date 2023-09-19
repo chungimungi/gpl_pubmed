@@ -1,0 +1,37 @@
+_target_: src.datamodules.datamodules.MultipleDataModule
+
+defaults:
+  - _self_
+  - loaders: default.yaml
+  - transforms: default.yaml
+
+datasets:
+  train:
+    label1:
+      _target_: src.datamodules.datasets.ClassificationDataset
+      json_path: ${paths.data_dir}/train/label1_data.json
+      data_path: ${paths.data_dir}/train/label1_data.h5
+    label2:
+      _target_: src.datamodules.datasets.ClassificationDataset
+      json_path: ${paths.data_dir}/train/label2_data.json
+      data_path: ${paths.data_dir}/train/label2_data.h5
+
+  valid:
+    label1:
+      _target_: src.datamodules.datasets.ClassificationDataset
+      json_path: ${paths.data_dir}/valid/label1_data.json
+      data_path: ${paths.data_dir}/valid/label1_data.h5
+    label2:
+      _target_: src.datamodules.datasets.ClassificationDataset
+      json_path: ${paths.data_dir}/valid/label2_data.json
+      data_path: ${paths.data_dir}/valid/label2_data.h5
+
+  test:
+    label1:
+      _target_: src.datamodules.datasets.ClassificationDataset
+      json_path: ${paths.data_dir}/test/label1_data.json
+      data_path: ${paths.data_dir}/test/label1_data.h5
+    label2:
+      _target_: src.datamodules.datasets.ClassificationDataset
+      json_path: ${paths.data_dir}/test/label2_data.json
+      data_path: ${paths.data_dir}/test/label2_data.h5
