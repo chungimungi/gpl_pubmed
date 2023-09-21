@@ -1,29 +1,26 @@
-import pytorch_lightning as pl
+import hydra
+from omegaconf import DictConfig
+from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
 import json
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
+@hydra.main(config_path="config.yaml")
 class QGenModel(pl.LightningModule):
     def __init__(
         self,
-        generator_name_or_path="doc2query/msmarco-t5-base-v1",
-        ques_per_passage=3,
-        bsz=32,
-        qgen_prefix="QGen",
-        save=True,
-        save_after=10000,
-        data_path=None
+        cfg: DictConfig,
     ):
         super().__init__()
 
-        self.generator = AutoModelForSeq2SeqLM.from_pretrained(generator_name_or_path)
-        self.ques_per_passage = ques_per_passage
-        self.bsz = bsz
-        self.qgen_prefix = qgen_prefix
-        self.save = save
-        self.save_after = save_after
-        self.data_path = data_path
+        self.generator = AutoModelForSeq2SeqLM.from_pretrained(cfg.generator_name_or_path)
+        self.ques_per_passage = cfg.ques_per_passage
+        self.bsz = cfg.bsz
+        self.qgen_prefix = cfg.qgen_prefix
+        self.save = cfg.save
+        self.save_after = cfg.save_after
+        self.data_path = cfg.data_path
 
         # Load the dataset
         self.dataset = load_dataset(self.data_path)
@@ -53,12 +50,4 @@ class QGenModel(pl.LightningModule):
                 fOut.write('\n')
 
 if __name__ == "__main__":
-    # Create the Lightning module.
-    model = QGenModel(data_path=args.data_path)
-
-    # Create the Trainer.
-    logger = wandb("logs")
-    trainer = pl.Trainer(logger=logger)
-
-    # Train the model.
-    trainer.fit(model, model.dataset)
+    hydra.run(QGenModel)
