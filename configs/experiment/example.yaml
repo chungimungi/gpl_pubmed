@@ -1,15 +1,20 @@
 # @package _global_
 
 # to execute this experiment run:
+
 # python train.py experiment=example
 
 defaults:
- - override /datamodule: mnist.yaml
- - override /module: mnist.yaml
- - override /callbacks: mnist.yaml
- - override /trainer: default.yaml
+
+  # override the datamodule, module, callbacks, and trainer configurations
+
+  - override /datamodule: mnist.yaml
+  - override /module: mnist.yaml
+  - override /callbacks: mnist.yaml
+  - override /trainer: default.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
+
 # this allows you to overwrite only specified parameters
 
 tags: ["mnist", "simple_dense_net"]
@@ -17,29 +22,38 @@ tags: ["mnist", "simple_dense_net"]
 seed: 12345
 
 trainer:
- gpus: 1
- min_epochs: 10
- max_epochs: 10
- gradient_clip_val: 0.5
+  # use GPU 1 to train the model
+  gpus: 1
+  # train for 10 to 10 epochs
+  min_epochs: 10
+  max_epochs: 10
+  # clip gradients to prevent exploding gradients
+  gradient_clip_val: 0.5
 
 module:
- optimizer:
-  lr: 0.002
- network:
-  model:
-   lin1_size: 128
-   lin2_size: 256
-   lin3_size: 64
+  optimizer:
+    # use an Adam optimizer with a learning rate of 0.002
+    lr: 0.002
+  network:
+    model:
+      # use a simple dense network with 3 linear layers
+      lin1_size: 128
+      lin2_size: 256
+      lin3_size: 64
 
 datamodules:
   gpl_lightning:
+    # target the GPLLightning class
     _target_: src.datamodules.gpl_lightning
   eval_lightning:
+    # target the EvalLightning class
     _target_: src.datamodules.eval_lightning
   data_lightning:
+    # target the DataLightning class
     _target_: src.datamodules.data_lightning
 
 logger:
- wandb:
-  tags: ${tags}
-  group: "mnist"
+  wandb:
+    # log the experiment to Weights & Biases with the given tags and group
+    tags: ${tags}
+    group: "mnist"
