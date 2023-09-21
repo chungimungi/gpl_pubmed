@@ -22,5 +22,14 @@ metrics:
     NDCG@10:
       _target_: "beir.evaluation.metrics.ndcg_at_k"
       k: 10
+
 output_activation:
   _target_: "torch.sigmoid"
+
+datamodules:
+  - _target_: src.datamodules.gpl_lightning
+  - _target_: src.datamodules.eval_lightning
+  - _target_: src.datamodules.data_lightning
+
+hydra:
+  runtime: sequential
