@@ -1,7 +1,6 @@
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import wandb
 import json
-import argparse
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
@@ -54,11 +53,6 @@ class QGenModel(pl.LightningModule):
                 fOut.write('\n')
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", required=True)
-    parser.add_argument("--output_dir", required=True)
-    args = parser.parse_args()
-
     # Create the Lightning module.
     model = QGenModel(data_path=args.data_path)
 
