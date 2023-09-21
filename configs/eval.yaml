@@ -11,8 +11,7 @@ defaults:
   - hydra: default.yaml
 
 task_name: "eval"
-predict: False
-
+predict: True
 tags: ["dev"]
 
 # passing checkpoint path is necessary for evaluation
