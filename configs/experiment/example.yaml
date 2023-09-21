@@ -17,6 +17,7 @@ tags: ["mnist", "simple_dense_net"]
 seed: 12345
 
 trainer:
+ gpus: 1
  min_epochs: 10
  max_epochs: 10
  gradient_clip_val: 0.5
