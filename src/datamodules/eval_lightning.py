@@ -1,4 +1,6 @@
-import pytorch_lightning as pl
+import hydra
+from omegaconf import DictConfig
+from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
 
 from beir import util, LoggingHandler
@@ -7,14 +9,23 @@ from beir.retrieval.evaluation import EvaluateRetrieval
 from beir.retrieval import models
 from beir.retrieval.search.dense import DenseRetrievalExactSearch as DRES
 
+@hydra.main(config_path="example.yaml")
 class GPLRetrieval(pl.LightningModule):
-    def __init__(self, model, batch_size=128):
+    """GPL retrieval model.
+
+    Args:
+        cfg (DictConfig): Configuration.
+    """
+
+    def __init__(self, cfg: DictConfig):
         super().__init__()
-        self.model = model
-        self.batch_size = batch_size
+
+        self.cfg = cfg
+
+        self.model = DRES(models.SentenceBERT(self.cfg.model.gpl_name), batch_size=self.cfg.batch_size)
 
     def configure_optimizers(self):
-        optimizer = Adam(self.model.parameters(), lr=1e-3)
+        optimizer = Adam(self.model.parameters(), lr=self.cfg.optimizer.lr)
         return optimizer
 
     def training_step(self, batch, batch_idx):
@@ -58,32 +69,4 @@ class GPLRetrieval(pl.LightningModule):
         return ndcg2, recall1, precision1
 
 if __name__ == "__main__":
-    # Load the corpus and queries.
-    data_path = "./datasets/nq"
-    corpus, queries, qrels = GenericDataLoader(data_path).load(split="test")
-
-    # Create the retrieval model.
-    base_name = "GPL/msmarco-distilbert-margin-mse"
-    gpl_name = "qberg/gpl-23m-bio"
-    model = DRES(models.SentenceBERT(gpl_name), batch_size=128)
-
-    # Create the LightningModule.
-    retriever = GPLRetrieval(model)
-
-    # Create the Trainer.
-    logger = wandb("logs")
-    trainer = pl.Trainer(logger=logger)
-
-    # Train the model.
-    trainer.fit(retriever)
-
-    # Evaluate the model.
-    results = trainer.test(retriever)
-
-    # Print the NDCG@2, recall@1, and precision@1.
-    ndcg2 = results["test_ndcg2"]
-    recall1 = results["test_recall1"]
-    precision1 = results["test_precision1"]
-    print(f"NDCG@2: {ndcg2:.4f}")
-    print(f"Recall@1: {recall1:.4f}")
-    print(f"Precision@1: {precision1:.4f}")
+    hydra.run(GPLRetrieval)
