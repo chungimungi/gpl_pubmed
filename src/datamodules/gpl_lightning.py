@@ -5,7 +5,7 @@ from pytorch_lightning.loggers import wandb
 
 from gpl import GPLModel
 
-@hydra.main(config_path="config.yaml")
+@hydra.main(config_path="example.yaml")
 class GPLLightningModule(pl.LightningModule):
     """GPLLightningModule.
 
