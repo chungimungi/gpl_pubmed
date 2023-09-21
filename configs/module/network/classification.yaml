@@ -19,6 +19,8 @@ metrics:
     AUROC:
       _target_: "torchmetrics.AUROC"
       task: "binary"
-
+    NDCG@10:
+      _target_: "beir.evaluation.metrics.ndcg_at_k"
+      k: 10
 output_activation:
   _target_: "torch.sigmoid"
