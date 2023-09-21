@@ -6,7 +6,7 @@ import json
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-@hydra.main(config_path="config.yaml")
+@hydra.main(config_path="example.yaml")
 class QGenModel(pl.LightningModule):
     def __init__(
         self,
