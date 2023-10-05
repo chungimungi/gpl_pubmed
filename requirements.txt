@@ -58,4 +58,4 @@ wandb
 numpy
 datasets==2.10.1
 transformers==4.26.1
-
+huggingface
