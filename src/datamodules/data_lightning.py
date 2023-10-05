@@ -1,11 +1,13 @@
+import json
+
 import hydra
+import pytorch_lightning as pl
+from datasets import load_dataset
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
-import json
-from datasets import load_dataset
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import pytorch_lightning as pl
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
 
 @hydra.main(config_path="example.yaml")
 class QGenModel(pl.LightningModule):
@@ -15,7 +17,9 @@ class QGenModel(pl.LightningModule):
     ):
         super().__init__()
 
-        self.generator = AutoModelForSeq2SeqLM.from_pretrained(cfg.generator_name_or_path)
+        self.generator = AutoModelForSeq2SeqLM.from_pretrained(
+            cfg.generator_name_or_path
+        )
         self.ques_per_passage = cfg.ques_per_passage
         self.bsz = cfg.bsz
         self.qgen_prefix = cfg.qgen_prefix
@@ -32,7 +36,7 @@ class QGenModel(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         # Generate queries for the current batch.
         queries = self.generator.generate(
-            batch['text'],
+            batch["text"],
             num_return_sequences=self.ques_per_passage,
             max_length=64,
             prefix=self.qgen_prefix,
@@ -40,15 +44,16 @@ class QGenModel(pl.LightningModule):
 
         # Save the generated queries to a file.
         if self.save and batch_idx % self.save_after == 0:
-            self.save_queries(queries, f'queries_{batch_idx}.jsonl')
+            self.save_queries(queries, f"queries_{batch_idx}.jsonl")
 
         return queries
 
     def save_queries(self, queries, filename):
-        with open(filename, 'w', encoding='utf-8') as fOut:
+        with open(filename, "w", encoding="utf-8") as fOut:
             for query in queries:
                 json.dump(query, fOut)
-                fOut.write('\n')
+                fOut.write("\n")
+
 
 if __name__ == "__main__":
     hydra.run(QGenModel)

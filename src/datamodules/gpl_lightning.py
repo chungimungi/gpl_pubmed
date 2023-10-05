@@ -1,9 +1,10 @@
 import hydra
+import pytorch_lightning as pl
+from gpl import GPLModel
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
-import pytorch_lightning as pl
-from gpl import GPLModel
+
 
 @hydra.main(config_path="example.yaml")
 class GPLLightningModule(pl.LightningModule):
@@ -53,6 +54,7 @@ class GPLLightningModule(pl.LightningModule):
 
         # Save the GPL model to the output directory.
         self.gpl_model.save_model(self.cfg.gpl.output_dir)
+
 
 if __name__ == "__main__":
     hydra.run(GPLLightningModule)

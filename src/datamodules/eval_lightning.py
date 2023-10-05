@@ -1,14 +1,15 @@
 import hydra
+import pytorch_lightning as pl
+from beir import LoggingHandler, util
+from beir.datasets.data_loader import GenericDataLoader
+from beir.retrieval import models
+from beir.retrieval.evaluation import EvaluateRetrieval
+from beir.retrieval.search.dense import DenseRetrievalExactSearch as DRES
+from keras.optimizers import adam
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
-import pytorch_lightning as pl
-from beir import util, LoggingHandler
-from beir.datasets.data_loader import GenericDataLoader
-from beir.retrieval.evaluation import EvaluateRetrieval
-from beir.retrieval import models
-from beir.retrieval.search.dense import DenseRetrievalExactSearch as DRES
-from keras.optimizers import adam
+
 
 @hydra.main(config_path="example.yaml")
 class GPLRetrieval(pl.LightningModule):
@@ -23,7 +24,10 @@ class GPLRetrieval(pl.LightningModule):
 
         self.cfg = cfg
 
-        self.model = DRES(models.SentenceBERT(self.cfg.model.gpl_name), batch_size=self.cfg.batch_size)
+        self.model = DRES(
+            models.SentenceBERT(self.cfg.model.gpl_name),
+            batch_size=self.cfg.batch_size,
+        )
 
     def configure_optimizers(self):
         optimizer = adam(self.model.parameters(), lr=self.cfg.optimizer.lr)
@@ -68,6 +72,7 @@ class GPLRetrieval(pl.LightningModule):
 
         # Return the NDCG@2, recall@1, and precision@1.
         return ndcg2, recall1, precision1
+
 
 if __name__ == "__main__":
     hydra.run(GPLRetrieval)
