@@ -39,7 +39,7 @@ six==1.16.0
 tokenizers==0.13.2
 tqdm==4.64.1
 typing_extensions==4.5.0
-urllib3==1.26.14
+urllib3==1.26.17
 xxhash==3.2.0
 yarl==1.8.2
 
