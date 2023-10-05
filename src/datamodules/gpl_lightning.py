@@ -2,7 +2,7 @@ import hydra
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
-
+import pytorch_lightning as pl
 from gpl import GPLModel
 
 @hydra.main(config_path="example.yaml")

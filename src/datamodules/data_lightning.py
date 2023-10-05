@@ -5,6 +5,7 @@ from pytorch_lightning.loggers import wandb
 import json
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import pytorch_lightning as pl
 
 @hydra.main(config_path="example.yaml")
 class QGenModel(pl.LightningModule):

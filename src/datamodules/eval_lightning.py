@@ -2,12 +2,13 @@ import hydra
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers import wandb
-
+import pytorch_lightning as pl
 from beir import util, LoggingHandler
 from beir.datasets.data_loader import GenericDataLoader
 from beir.retrieval.evaluation import EvaluateRetrieval
 from beir.retrieval import models
 from beir.retrieval.search.dense import DenseRetrievalExactSearch as DRES
+from keras.optimizers import adam
 
 @hydra.main(config_path="example.yaml")
 class GPLRetrieval(pl.LightningModule):
@@ -25,7 +26,7 @@ class GPLRetrieval(pl.LightningModule):
         self.model = DRES(models.SentenceBERT(self.cfg.model.gpl_name), batch_size=self.cfg.batch_size)
 
     def configure_optimizers(self):
-        optimizer = Adam(self.model.parameters(), lr=self.cfg.optimizer.lr)
+        optimizer = adam(self.model.parameters(), lr=self.cfg.optimizer.lr)
         return optimizer
 
     def training_step(self, batch, batch_idx):
