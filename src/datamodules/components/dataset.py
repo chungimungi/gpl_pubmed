@@ -1,77 +1,56 @@
-import io
 from pathlib import Path
 from typing import Any, Callable, Optional
-
-import cv2
-import numpy as np
 import torch
-from PIL import Image
 from torch.utils.data import Dataset
-
 
 class BaseDataset(Dataset):
     def __init__(
         self,
-        transforms: Optional[Callable] = None,
-        read_mode: str = "pillow",
-        to_gray: bool = False,
+        transforms: Optional[Callable] = None
     ) -> None:
-        """BaseDataset.
+        """TextDataset.
 
         Args:
-            transforms (Callable): Transforms.
-            read_mode (str): Image read mode, `pillow` or `cv2`. Default to `pillow`.
-            to_gray (bool): Images to gray mode. Default to False.
+            transforms (Callable): Text preprocessing transforms.
         """
 
-        self.read_mode = read_mode
-        self.to_gray = to_gray
         self.transforms = transforms
 
-    def _read_image_(self, image: Any) -> np.ndarray:
-        """Read image from source.
+    def _read_text_(self, text: Any) -> str:
+        """Read text from source.
 
         Args:
-            image (Any): Image source. Could be str, Path or bytes.
+            text (Any): Text source. Could be str, Path, or bytes.
 
         Returns:
-            np.ndarray: Loaded image.
+            str: Loaded text.
         """
 
-        if self.read_mode == "pillow":
-            if not isinstance(image, (str, Path)):
-                image = io.BytesIO(image)
-            image = np.asarray(Image.open(image).convert("RGB"))
-        elif self.read_mode == "cv2":
-            if not isinstance(image, (str, Path)):
-                image = np.frombuffer(image, np.uint8)
-                image = cv2.imdecode(image, cv2.COLOR_RGB2BGR)
-            else:
-                image = cv2.imread(image)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        else:
-            raise NotImplementedError("use pillow or cv2")
-        if self.to_gray:
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-        return image
+        if isinstance(text, (str, Path)):
+            with open(text, 'r', encoding='utf-8') as file:
+                text = file.read()
+        elif isinstance(text, bytes):
+            text = text.decode('utf-8')
+        return text
 
-    def _process_image_(self, image: np.ndarray) -> torch.Tensor:
-        """Process image, including transforms, etc.
+    def _process_text_(self, text: str) -> torch.Tensor:
+        """Process text, including text preprocessing transforms, etc.
 
         Args:
-            image (np.ndarray): Image in np.ndarray format.
+            text (str): Text data.
 
         Returns:
-            torch.Tensor: Image prepared for dataloader.
+            torch.Tensor: Text prepared for dataloader.
         """
-
         if self.transforms:
-            image = self.transforms(image=image)["image"]
-        return torch.from_numpy(image).permute(2, 0, 1)
+            text = self.transforms(text)
+        return text
 
     def __getitem__(self, index: int) -> Any:
+        # Implement this method to load and process text data based on your specific dataset structure.
+        # For example, you might load JSON files, preprocess them, and return the text data.
         raise NotImplementedError()
 
     def __len__(self) -> int:
+        # Implement this method to return the total number of text samples in your dataset.
         raise NotImplementedError()
