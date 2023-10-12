@@ -4,7 +4,7 @@
 
 `pip install -r requirements.txt`
 
-## Import dataset using the huggingface module
+
 
 ```python
 from huggingface_hub import hf_hub_download
