@@ -7,7 +7,7 @@ import numpy as np
 
 from src.datamodules.components.dataset import BaseDataset
 
-json_path = '/home/chedi/gpl_pubmed/data/corpus0.jsonl'
+json_path = ' ' #path to preprocessed json file
 class TextClassificationDataset(BaseDataset):
     def __init__(
         self,
